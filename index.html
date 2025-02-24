@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet GeoJSON Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="geotagged_images.json"></script> <!-- Load your GeoJSON file -->
+</head>
+<body>
+    <div id="map" style="height: 100vh;"></div>
+    <script>
+	var map = L.map('map', {maxZoom: 40}).setView([13.6525, 123.3494], 10); // Default to world view
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).remove(); // Remove previous tile layer
+        
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map);
+        
+        var geojsonLayer = L.geoJSON(images, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng);
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.url) {
+                    layer.on('click', function () {
+                        var popup = window.open(feature.properties.url, '', 'width=' + (window.innerWidth * 0.75) + ',height=' + (window.innerHeight * 0.75));
+                    });
+                }
+            }
+        }).addTo(map);
+    </script>
+</body>
+</html>
